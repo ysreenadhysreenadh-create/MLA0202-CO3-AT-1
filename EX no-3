@@ -1,0 +1,217 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.datasets import load_wine
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA, FactorAnalysis, FastICA
+
+wine = load_wine()
+
+X = wine.data
+y = wine.target
+
+feature_names = wine.feature_names
+print("Y sreenadh 192525166")
+
+print("Dataset Shape:")
+print(X.shape)
+
+print("\nNumber of Features:")
+print(X.shape[1])
+
+print("\nFeature Names:")
+print(feature_names)
+
+print("\nNumber of Classes:")
+print(len(np.unique(y)))
+
+df = pd.DataFrame(
+    X,
+    columns=feature_names
+)
+
+print("\nFirst 5 Rows:")
+print(df.head())
+
+scaler = StandardScaler()
+
+X_scaled = scaler.fit_transform(X)
+
+print("\nStandardized Data Shape:")
+print(X_scaled.shape)
+
+pca = PCA(n_components=2)
+
+X_pca = pca.fit_transform(X_scaled)
+
+print("\nPCA RESULTS")
+
+print("Explained Variance Ratio:")
+print(pca.explained_variance_ratio_)
+
+print(
+    "\nTotal Variance Explained:",
+    sum(pca.explained_variance_ratio_)
+)
+
+print("\nPCA Components:")
+
+print(
+    pd.DataFrame(
+        pca.components_,
+        columns=feature_names,
+        index=["PC1", "PC2"]
+    )
+)
+
+fa = FactorAnalysis(
+    n_components=2,
+    random_state=42
+)
+
+X_fa = fa.fit_transform(X_scaled)
+
+print("\nFACTOR ANALYSIS RESULTS")
+
+print(
+    "Factor Loadings Shape:",
+    fa.components_.shape
+)
+
+print("\nFactor Loadings:")
+
+print(
+    pd.DataFrame(
+        fa.components_,
+        columns=feature_names,
+        index=["Factor1", "Factor2"]
+    )
+    "ICA Component Shape:",
+    ica.components_.shape
+)
+
+print("\nICA Components:")
+
+print(
+    pd.DataFrame(
+        ica.components_,
+        columns=feature_names,
+        index=["IC1", "IC2"]
+    )
+)
+
+pca_df = pd.DataFrame(
+    X_pca,
+    columns=["PC1", "PC2"]
+)
+
+pca_df["Class"] = y
+
+fa_df = pd.DataFrame(
+    X_fa,
+    columns=["Factor1", "Factor2"]
+)
+
+fa_df["Class"] = y
+
+ica_df = pd.DataFrame(
+    X_ica,
+    columns=["IC1", "IC2"]
+)
+
+ica_df["Class"] = y
+
+plt.figure(figsize=(9, 7))
+
+sns.scatterplot(
+    data=pca_df,
+    x="PC1",
+    y="PC2",
+    hue="Class",
+    palette="viridis",
+    s=80
+)
+
+plt.title("Wine Dataset - PCA")
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(9, 7))
+
+sns.scatterplot(
+    data=fa_df,
+    x="Factor1",
+    y="Factor2",
+    hue="Class",
+    palette="viridis",
+    s=80
+)
+
+plt.title("Wine Dataset - Factor Analysis")
+plt.xlabel("Factor 1")
+plt.ylabel("Factor 2")
+plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(9, 7))
+
+sns.scatterplot(
+    data=ica_df,
+    x="IC1",
+    y="IC2",
+    hue="Class",
+    palette="viridis",
+    s=80
+)
+
+plt.title("Wine Dataset - ICA")
+plt.xlabel("Independent Component 1")
+plt.ylabel("Independent Component 2")
+plt.grid(True)
+plt.show()
+print("\nDIMENSIONALITY REDUCTION COMPARISON")
+print("Original Dimensions:", X.shape[1])
+print("PCA Dimensions:", X_pca.shape[1])
+print("Factor Analysis Dimensions:", X_fa.shape[1])
+print("ICA Dimensions:", X_ica.shape[1])
+pca_full = PC
+cumulative_variance = np.cumsum(
+    pca_full.explained_variance_ratio_
+)
+
+plt.figure(figsize=(9, 6))
+
+plt.plot(
+    range(1, len(cumulative_variance) + 1),
+    cumulative_variance,
+    marker="o"
+)
+plt.xlabel("Number of Principal Components")
+plt.ylabel("Cumulative Explained Variance")
+plt.title("PCA - Cumulative Explained Variance")
+plt.axhline(
+    y=0.90,
+    linestyle="--",
+    label="90% Variance"
+)
+plt.axhline(
+    y=0.95,
+    linestyle="--",
+    label="95% Variance"
+)
+plt.legend()
+plt.grid(True)
+    cumulative_variance >= 0.95
+) + 1
+print(
+    "\nComponents required for 90% variance:",
+    components_90
+)
+print(
+    "Components required for 95% variance:",
+    components_95
+)
