@@ -1,0 +1,222 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.datasets import load_digits
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.mixture import GaussianMixture
+from sklearn.decomposition import PCA
+from sklearn.metrics import (
+    silhouette_score,
+    davies_bouldin_score,
+    calinski_harabasz_score,
+    adjusted_rand_score,
+    normalized_mutual_info_score
+)
+
+digits = load_digits()
+
+X = digits.data
+y = digits.target
+
+print("Dataset Shape:", X.shape)
+
+print("\nNumber of Classes:", len(np.unique(y)))
+
+print("\nClasses:")
+print(np.unique(y))
+
+scaler = StandardScaler()
+
+X_scaled = scaler.fit_transform(X)
+
+print("\nScaled Data Shape:")
+print(X_scaled.shape)
+
+plt.figure(figsize=(4, 4))
+
+plt.imshow(
+    X[0].reshape(8, 8),
+    cmap="gray"
+)
+
+plt.title(f"Sample Digit - Label: {y[0]}")
+
+plt.axis("off")
+
+plt.show()
+
+n_clusters = 10
+
+kmeans = KMeans(
+    n_clusters=n_clusters,
+    random_state=42,
+    n_init=10
+)
+
+kmeans_labels = kmeans.fit_predict(X_scaled)
+
+gmm = GaussianMixture(
+    n_components=n_clusters,
+    covariance_type="full",
+    random_state=42
+)
+
+gmm_labels = gmm.fit_predict(X_scaled)
+
+kmeans_silhouette = silhouette_score(
+    X_scaled,
+    kmeans_labels
+)
+
+kmeans_db = davies_bouldin_score(
+    X_scaled,
+    kmeans_labels
+)
+
+kmeans_ch = calinski_harabasz_score(
+    X_scaled,
+    kmeans_labels
+)
+
+gmm_silhouette = silhouette_score(
+    X_scaled,
+    gmm_labels
+)
+
+gmm_db = davies_bouldin_score(
+    X_scaled,
+    gmm_labels
+)
+
+gmm_ch = calinski_harabasz_score(
+    X_scaled,
+    gmm_labels
+)
+
+kmeans_ari = adjusted_rand_score(
+    y,
+    kmeans_labels
+)
+
+gmm_ari = adjusted_rand_score(
+    y,
+    gmm_labels
+)
+
+kmeans_nmi = normalized_mutual_info_score(
+    y,
+    kmeans_labels
+)
+
+gmm_nmi = normalized_mutual_info_score(
+    y,
+    gmm_labels
+)
+
+results = pd.DataFrame({
+    "Metric": [
+        "Silhouette Score",
+        "Davies-Bouldin Index",
+        "Calinski-Harabasz Index",
+        "Adjusted Rand Index",
+        "Normalized Mutual Information"
+    ],
+    "K-Means": [
+        kmeans_silhouette,
+        kmeans_db,
+        kmeans_ch,
+        kmeans_ari,
+        kmeans_nmi
+    ],
+    "Gaussian Mixture Model": [
+        gmm_silhouette,
+        gmm_db,
+        gmm_ch,
+        gmm_ari,
+        gmm_nmi
+    ]
+})
+
+print("\nK-MEANS vs GMM PERFORMANCE")
+print(results.to_string(index=False))
+
+pca = PCA(n_components=2)
+
+X_pca = pca.fit_transform(X_scaled)
+
+print("\nPCA Explained Variance:")
+print(pca.explained_variance_ratio_)
+
+print(
+    "Total Variance Explained:",
+    sum(pca.explained_variance_ratio_)
+)
+
+plt.figure(figsize=(9, 7))
+
+scatter = plt.scatter(
+    X_pca[:, 0],
+    X_pca[:, 1],
+    c=kmeans_labels,
+    cmap="tab10",
+    s=15
+)
+
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.title("Digits Dataset - K-Means Clustering after PCA")
+
+plt.colorbar(
+    scatter,
+    label="Cluster"
+)
+
+plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(9, 7))
+
+scatter = plt.scatter(
+    X_pca[:, 0],
+    X_pca[:, 1],
+    c=gmm_labels,
+    cmap="tab10",
+    s=15
+)
+
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.title("Digits Dataset - GMM (EM) Clustering after PCA")
+
+plt.colorbar(
+    scatter,
+    label="Cluster"
+)
+
+plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(9, 7))
+
+scatter = plt.scatter(
+    X_pca[:, 0],
+    X_pca[:, 1],
+    c=y,
+    cmap="tab10",
+    s=15
+)
+
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.title("Actual Digit Classes after PCA")
+
+plt.colorbar(
+    scatter,
+    label="Actual Digit"
+)
+
+plt.grid(True)
+plt.show()
